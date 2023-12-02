@@ -1,0 +1,17 @@
+DELIMITER //
+
+CREATE FUNCTION GetEpisodeList(s_id INT, s_number INT)
+RETURNS VARCHAR(1024)
+BEGIN
+    DECLARE episode_list VARCHAR(1024);
+
+   
+    SELECT GROUP_CONCAT(episode_title ORDER BY episode_number ASC SEPARATOR ', ')
+    INTO episode_list
+    FROM episodes
+    WHERE series_id = s_id AND season_number = s_number;
+
+    RETURN episode_list;
+END //
+
+DELIMITER ;
