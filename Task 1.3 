@@ -1,0 +1,58 @@
+DELIMITER //
+CREATE TRIGGER AdjustRating
+BEFORE INSERT ON user_history
+FOR EACH ROW
+BEGIN
+    DECLARE episode_length REAL;
+    DECLARE series_rating DOUBLE;
+
+    -- a. Check if x is less than or equal to the length of the episode
+    SELECT episode_length INTO episode_length
+    FROM episodes
+    WHERE episode_id = NEW.episode_id;
+
+    IF NEW.minutes_played > episode_length THEN
+        SET NEW.minutes_played = episode_length;
+    END IF;
+
+    -- b. Add 0.0001*x to the rating of the series
+    SELECT rating INTO series_rating
+    FROM series
+    WHERE series_id = (
+        SELECT series_id
+        FROM episodes
+        WHERE episode_id = NEW.episode_id
+    );
+
+    IF series_rating < 5.00 THEN
+        SET series_rating = series_rating + 0.0001 * NEW.minutes_played;
+
+        -- Update the rating of the series
+        UPDATE series
+        SET rating = series_rating
+        WHERE series_id = (
+            SELECT series_id
+            FROM episodes
+            WHERE episode_id = NEW.episode_id
+        );
+    END IF;
+END //
+DELIMITER ;
+
+-- CREATE VIEW statements (placeholders)
+CREATE VIEW view1 AS SELECT ...;
+CREATE VIEW view2 AS SELECT ...;
+
+-- CREATE PROCEDURE statement (placeholders)
+CREATE PROCEDURE procedure1()
+BEGIN
+    -- Procedure code here
+END;
+
+-- CREATE FUNCTION statement (placeholders)
+CREATE FUNCTION function1()
+RETURNS INT
+BEGIN
+    -- Function code here
+    RETURN 0;
+END;
