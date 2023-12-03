@@ -6,23 +6,19 @@ BEGIN
     DECLARE episodeLength REAL;
     DECLARE seriesRating DOUBLE;
 
-    -- get episode length
     SELECT episode_length INTO episodeLength
     FROM episodes
     WHERE episode_id = NEW.episode_id;
 
-    -- Check if minutes_played is greater than the episode length
     IF NEW.minutes_played > episodeLength THEN
         SET NEW.minutes_played = episodeLength;
     END IF;
 
-    -- get the series rating
     SELECT rating INTO seriesRating
     FROM series
     INNER JOIN episodes ON series.series_id = episodes.series_id
     WHERE episodes.episode_id = NEW.episode_id;
 
-    -- Update the series rating if it's less than 5
     IF seriesRating < 5.00 THEN
         UPDATE series
         SET rating = LEAST(5.00, seriesRating + 0.0001 * NEW.minutes_played)
