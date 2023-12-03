@@ -84,6 +84,7 @@ END //
 DELIMITER ;
 
 --1.4
+
 DELIMITER //
 
 
@@ -113,6 +114,7 @@ DELIMITER ;
 
 
 --1.5
+
 DELIMITER //
 
 CREATE FUNCTION GetEpisodeList(s_id INT, s_number INT)
