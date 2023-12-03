@@ -1,4 +1,5 @@
 -- 1.1
+
 CREATE VIEW actor_minutes AS
 SELECT a.actor_id, a.actor_name, SUM(uh.minutes_played) AS total_minutes_played
 FROM actors a
@@ -8,7 +9,7 @@ LEFT JOIN user_history uh ON e.episode_id = uh.episode_id
 GROUP BY a.actor_id, a.actor_name;
 
 --1.2
--- View 1: Create a view with the maximum rating for all series
+
 CREATE VIEW top_series_rating AS
 SELECT
     series_id,
@@ -18,7 +19,6 @@ FROM
 GROUP BY
     series_id;
 
--- View 2: Create a view with all the actors who play in at least one episode of each series
 CREATE VIEW series_actors AS
 SELECT
     s.series_id,
@@ -34,7 +34,6 @@ JOIN
 GROUP BY
     s.series_id;
 
--- Top Series Cast View: Create a view with the top series above a rating of 4.00 using series ID, Title and their cast
 CREATE VIEW top_series_cast AS
 SELECT
     s.series_id,
@@ -48,7 +47,6 @@ JOIN
     series_actors sa ON s.series_id = sa.series_id
 WHERE
     tr.max_rating >= 4.00;
-
 
 -- 1.3
 
