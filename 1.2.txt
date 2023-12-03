@@ -1,0 +1,40 @@
+-- View 1: Create a view with the maximum rating for all series
+CREATE VIEW top_series_rating AS
+SELECT
+    series_id,
+    MAX(rating) AS max_rating
+FROM
+    series
+GROUP BY
+    series_id;
+
+-- View 2: Create a view with all the actors who play in at least one episode of each series
+CREATE VIEW series_actors AS
+SELECT
+    s.series_id,
+    GROUP_CONCAT(DISTINCT a.actor_name) AS cast
+FROM
+    series s
+JOIN
+    episodes e ON s.series_id = e.series_id
+JOIN
+    actor_episode ae ON e.episode_id = ae.episode_id
+JOIN
+    actors a ON ae.actor_id = a.actor_id
+GROUP BY
+    s.series_id;
+
+-- Top Series Cast View: Create a view with the top series above a rating of 4.00 using series ID, Title and their cast
+CREATE VIEW top_series_cast AS
+SELECT
+    s.series_id,
+    s.series_title,
+    sa.cast
+FROM
+    series s
+JOIN
+    top_series_rating tr ON s.series_id = tr.series_id
+JOIN
+    series_actors sa ON s.series_id = sa.series_id
+WHERE
+    tr.max_rating >= 4.00;
