@@ -51,38 +51,31 @@ WHERE
 
 
 -- 1.3
+
 DELIMITER //
 CREATE TRIGGER AdjustRating
 BEFORE INSERT ON user_history
 FOR EACH ROW
 BEGIN
-    DECLARE episode_length REAL;
-    DECLARE series_rating DOUBLE;
+    DECLARE episodeLength REAL;
+    DECLARE seriesRating DOUBLE;
 
-    -- a. If x is less than or equal to length of episode
-    SELECT episode_length INTO episode_length
+    SELECT episode_length INTO episodeLength
     FROM episodes
     WHERE episode_id = NEW.episode_id;
 
-    IF NEW.minutes_played > episode_length THEN
-        SET NEW.minutes_played = episode_length;
+    IF NEW.minutes_played > episodeLength THEN
+        SET NEW.minutes_played = episodeLength;
     END IF;
 
-    -- b. Add 0.0001 * x to rating
-    SELECT rating INTO series_rating
+    SELECT rating INTO seriesRating
     FROM series
-    WHERE series_id = (
-        SELECT series_id
-        FROM episodes
-        WHERE episode_id = NEW.episode_id
-    );
+    INNER JOIN episodes ON series.series_id = episodes.series_id
+    WHERE episodes.episode_id = NEW.episode_id;
 
-    IF series_rating < 5.00 THEN
-        SET series_rating = series_rating + 0.0001 * NEW.minutes_played;
-
-        -- Update rating of series
+    IF seriesRating < 5.00 THEN
         UPDATE series
-        SET rating = series_rating
+        SET rating = LEAST(5.00, seriesRating + 0.0001 * NEW.minutes_played)
         WHERE series_id = (
             SELECT series_id
             FROM episodes
@@ -91,11 +84,6 @@ BEGIN
     END IF;
 END //
 DELIMITER ;
-
-
-
-
-
 
 --1.4
 DELIMITER //
